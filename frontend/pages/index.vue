@@ -1,34 +1,21 @@
 <template>
   <div class="container">
     <div>
-      <Logo />
-      <h1 class="title">frontend</h1>
-      <div class="links">
-        <a
-          href="https://nuxtjs.org/"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="button--green bg-"
-        >
-          Documentation
-        </a>
-        <a
-          href="https://github.com/nuxt/nuxt.js"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="button--grey"
-        >
-          Get Fucked
-        </a>
-      </div>
+      <h1 class="text-5xl">Nuxt-Behaviour trees</h1>
+      <p>Check the console</p>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
+import { defineComponent } from '@nuxtjs/composition-api';
+import useBT from '../hooks/useBehaviourTree';
 
-export default Vue.extend({});
+export default defineComponent({
+  setup() {
+    useBT();
+  },
+});
 </script>
 
 <style>
