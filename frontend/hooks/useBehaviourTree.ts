@@ -20,8 +20,8 @@ const printNumberCommand = (numberRef: Ref<number>) => {
   return NodeState.Success;
 };
 
-const checkLessThanEqualToCommand = (number1: number, number2: number) => {
-  return number1 <= number2;
+const checkLessThanToCommand = (number1: number, number2: number) => {
+  return number1 < number2;
 };
 
 const incrementNumberCommand = (numberRef: Ref<number>) => {
@@ -38,13 +38,13 @@ const incrementNumberAction = new ActionNode<Blackboard>(() =>
 );
 
 const checkForLimitReachedAction = new ConditionNode<Blackboard>(() =>
-  checkLessThanEqualToCommand(runningCount.value, maxCount.value)
+  checkLessThanToCommand(runningCount.value, maxCount.value)
 );
 
 const countToTenSequence = new SequenceNode<Blackboard>([
   checkForLimitReachedAction,
-  // printNumberAction,
   incrementNumberAction,
+  // printNumberAction,
 ]);
 
 const repeatUntilFailureNode = new RepeatUntilFailureNode<Blackboard>(
