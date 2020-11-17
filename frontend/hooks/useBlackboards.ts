@@ -1,3 +1,3 @@
-export class TestBlackboard {}
+export class Blackboard {}
 
-export const blackboard = new TestBlackboard();
+export const blackboard = new Blackboard();
