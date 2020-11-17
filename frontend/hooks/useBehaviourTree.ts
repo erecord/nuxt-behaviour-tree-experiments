@@ -5,13 +5,15 @@ import {
   RepeatUntilFailureNode,
   SequenceNode,
 } from '@yoody/behaviour-tree';
-import { onMounted, onUnmounted, Ref, ref } from '@nuxtjs/composition-api';
+import { onUnmounted, Ref, ref } from '@nuxtjs/composition-api';
 import { blackboard, Blackboard } from './useBlackboards';
 
 const DELAY = 200;
+let interval: NodeJS.Timeout;
 
 const runningCount = ref<number>(0);
-const maxCount = 10;
+const maxCount = ref<number>(0);
+const currentState = ref<NodeState>();
 
 const printNumberCommand = (numberRef: Ref<number>) => {
   console.log(`Current Value: ${numberRef.value}`);
@@ -36,31 +38,42 @@ const incrementNumberAction = new ActionNode<Blackboard>(() =>
 );
 
 const checkForLimitReachedAction = new ConditionNode<Blackboard>(() =>
-  checkLessThanEqualToCommand(runningCount.value, maxCount)
+  checkLessThanEqualToCommand(runningCount.value, maxCount.value)
 );
 
 const countToTenSequence = new SequenceNode<Blackboard>([
-  printNumberAction,
-  incrementNumberAction,
   checkForLimitReachedAction,
+  // printNumberAction,
+  incrementNumberAction,
 ]);
 
 const repeatUntilFailureNode = new RepeatUntilFailureNode<Blackboard>(
   countToTenSequence
 );
 
+const resetBehaviourTree = () => {
+  runningCount.value = 0;
+  currentState.value = undefined;
+};
+
+const startCountToBT = (countTo: number) => {
+  maxCount.value = countTo;
+  interval = setInterval(() => {
+    currentState.value = repeatUntilFailureNode.tick(blackboard);
+    if (currentState.value === NodeState.Failure) stopCountToBT();
+  }, DELAY);
+};
+
+const stopCountToBT = () => clearInterval(interval);
+
 export default function () {
-  let interval: NodeJS.Timeout;
+  onUnmounted(() => stopCountToBT());
 
-  onMounted(() => {
-    interval = setInterval(() => {
-      const result = repeatUntilFailureNode.tick(blackboard);
-      if (result === NodeState.Failure) clearInterval(interval);
-      console.log(result);
-    }, DELAY);
-  });
-
-  onUnmounted(() => clearInterval(interval));
-
-  return {};
+  return {
+    startCountToBT,
+    stopCountToBT,
+    resetBehaviourTree,
+    currentState,
+    runningCount,
+  };
 }

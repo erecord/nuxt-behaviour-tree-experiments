@@ -1,20 +1,17 @@
 <template>
   <div class="container">
     <div>
-      <h1 class="text-5xl">Nuxt-Behaviour trees</h1>
-      <p>Check the console</p>
+      <h1 class="text-5xl">Nuxt Behaviour Tree Experiments</h1>
+      <BehaviourTree class="mt-12" />
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from '@nuxtjs/composition-api';
-import useBT from '../hooks/useBehaviourTree';
 
 export default defineComponent({
-  setup() {
-    useBT();
-  },
+  setup() {},
 });
 </script>
 
