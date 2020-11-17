@@ -27,8 +27,13 @@ import useBlackboards from '../hooks/useBlackboards';
 
 export default defineComponent({
   setup() {
-    const { startCountToBT, stopCountToBT, resetBehaviourTree } = useBT();
-    const { currentNodeState, currentCount, targetCount } = useBlackboards();
+    const { startCountToBT, stopCountToBT } = useBT();
+    const {
+      currentNodeState,
+      currentCount,
+      targetCount,
+      reset,
+    } = useBlackboards();
 
     const stateColour = computed(() => {
       switch (currentNodeState.value) {
@@ -46,7 +51,7 @@ export default defineComponent({
     return {
       start: startCountToBT,
       stop: stopCountToBT,
-      reset: resetBehaviourTree,
+      reset,
       stateColour,
       currentCount,
       targetCount,

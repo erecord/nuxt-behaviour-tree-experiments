@@ -52,11 +52,7 @@ export default function () {
 
   const repeatUntilFailureNode = new RepeatUntilFailureNode(countToTenSequence);
 
-  const { reset, currentNodeState } = useBlackboards();
-
-  const resetBehaviourTree = () => {
-    reset();
-  };
+  const { currentNodeState } = useBlackboards();
 
   const stopBTCondition = () => currentNodeState.value === NodeState.Failure;
 
@@ -70,6 +66,5 @@ export default function () {
   return {
     startCountToBT,
     stopCountToBT,
-    resetBehaviourTree,
   };
 }
