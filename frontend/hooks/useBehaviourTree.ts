@@ -5,18 +5,15 @@ import {
   RepeatUntilFailureNode,
   SequenceNode,
 } from '@yoody/behaviour-tree';
-import { onUnmounted, Ref, ref } from '@nuxtjs/composition-api';
-import { blackboard, Blackboard } from './useBlackboards';
+import { onUnmounted, Ref } from '@nuxtjs/composition-api';
+import useBlackboards from './useBlackboards';
+import { IBlackboard } from '~/types';
 
 const DELAY = 200;
 let interval: NodeJS.Timeout;
 
-const runningCount = ref<number>(0);
-const maxCount = ref<number>(0);
-const currentState = ref<NodeState>();
-
-const printNumberCommand = (numberRef: Ref<number>) => {
-  console.log(`Current Value: ${numberRef.value}`);
+const consoleLogCommand = (value: any) => {
+  console.log(value);
   return NodeState.Success;
 };
 
@@ -24,44 +21,9 @@ const checkLessThanToCommand = (number1: number, number2: number) => {
   return number1 < number2;
 };
 
-const incrementNumberCommand = (numberRef: Ref<number>) => {
+const incrementNumberRefCommand = (numberRef: Ref<number>) => {
   numberRef.value++;
   return NodeState.Success;
-};
-
-const printNumberAction = new ActionNode<Blackboard>(() =>
-  printNumberCommand(runningCount)
-);
-
-const incrementNumberAction = new ActionNode<Blackboard>(() =>
-  incrementNumberCommand(runningCount)
-);
-
-const checkForLimitReachedAction = new ConditionNode<Blackboard>(() =>
-  checkLessThanToCommand(runningCount.value, maxCount.value)
-);
-
-const countToTenSequence = new SequenceNode<Blackboard>([
-  checkForLimitReachedAction,
-  incrementNumberAction,
-  // printNumberAction,
-]);
-
-const repeatUntilFailureNode = new RepeatUntilFailureNode<Blackboard>(
-  countToTenSequence
-);
-
-const resetBehaviourTree = () => {
-  runningCount.value = 0;
-  currentState.value = undefined;
-};
-
-const startCountToBT = (countTo: number) => {
-  maxCount.value = countTo;
-  interval = setInterval(() => {
-    currentState.value = repeatUntilFailureNode.tick(blackboard);
-    if (currentState.value === NodeState.Failure) stopCountToBT();
-  }, DELAY);
 };
 
 const stopCountToBT = () => clearInterval(interval);
@@ -69,11 +31,45 @@ const stopCountToBT = () => clearInterval(interval);
 export default function () {
   onUnmounted(() => stopCountToBT());
 
+  const printNumberAction = new ActionNode<IBlackboard>(({ currentCount }) =>
+    consoleLogCommand(currentCount.value)
+  );
+
+  const incrementRunningCountAction = new ActionNode<IBlackboard>(
+    ({ currentCount }) => incrementNumberRefCommand(currentCount)
+  );
+
+  const checkForLimitReachedAction = new ConditionNode<IBlackboard>(
+    ({ currentCount, targetCount }) =>
+      checkLessThanToCommand(currentCount.value, targetCount.value)
+  );
+
+  const countToTenSequence = new SequenceNode([
+    checkForLimitReachedAction,
+    incrementRunningCountAction,
+    // printNumberAction,
+  ]);
+
+  const repeatUntilFailureNode = new RepeatUntilFailureNode(countToTenSequence);
+
+  const { reset, currentNodeState } = useBlackboards();
+
+  const resetBehaviourTree = () => {
+    reset();
+  };
+
+  const stopBTCondition = () => currentNodeState.value === NodeState.Failure;
+
+  const startCountToBT = () => {
+    interval = setInterval(() => {
+      currentNodeState.value = repeatUntilFailureNode.tick(useBlackboards());
+      if (stopBTCondition()) stopCountToBT();
+    }, DELAY);
+  };
+
   return {
     startCountToBT,
     stopCountToBT,
     resetBehaviourTree,
-    currentState,
-    runningCount,
   };
 }
