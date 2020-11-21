@@ -5,12 +5,15 @@ import {
   RepeatUntilFailureNode,
   SequenceNode,
 } from '@yoody/behaviour-tree';
-import { onUnmounted, Ref } from '@nuxtjs/composition-api';
+import { onUnmounted, ref, Ref } from '@nuxtjs/composition-api';
 import useBlackboards from './useBlackboards';
 import { IBlackboard } from '~/types';
 
 const DELAY = 200;
 let interval: NodeJS.Timeout;
+const currentNodeState = ref<NodeState>();
+
+// #region Commands
 
 const consoleLogCommand = (value: any) => {
   console.log(value);
@@ -25,12 +28,13 @@ const incrementNumberRefCommand = (numberRef: Ref<number>) => {
   numberRef.value++;
   return NodeState.Success;
 };
+// #endregion
 
 const stopCountToBT = () => clearInterval(interval);
 
 export default function () {
   onUnmounted(() => stopCountToBT());
-
+  // #region Actions
   const printNumberAction = new ActionNode<IBlackboard>(({ currentCount }) =>
     consoleLogCommand(currentCount.value)
   );
@@ -44,6 +48,8 @@ export default function () {
       checkLessThanToCommand(currentCount.value, targetCount.value)
   );
 
+  // #endregion
+
   const countToTenSequence = new SequenceNode([
     checkForLimitReachedAction,
     incrementRunningCountAction,
@@ -51,8 +57,6 @@ export default function () {
   ]);
 
   const repeatUntilFailureNode = new RepeatUntilFailureNode(countToTenSequence);
-
-  const { currentNodeState } = useBlackboards();
 
   const stopBTCondition = () => currentNodeState.value === NodeState.Failure;
 
@@ -64,6 +68,7 @@ export default function () {
   };
 
   return {
+    currentNodeState,
     startCountToBT,
     stopCountToBT,
   };

@@ -4,10 +4,7 @@
     <Button :text="'Stop'" @click="stop" />
     <Button :text="'Reset'" @click="reset" />
 
-    <div class="flex justify-center items-center mt-4">
-      <p>Tree State</p>
-      <div :class="'h-12 w-12 ml-3 ' + stateColour"></div>
-    </div>
+    <TreeState :current-node-state="currentNodeState" />
     <div class="flex justify-center items-center mt-4">
       <p>Current Count {{ currentCount }}</p>
     </div>
@@ -19,40 +16,21 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from '@nuxtjs/composition-api';
-import { NodeState } from '@yoody/behaviour-tree';
+import { defineComponent } from '@nuxtjs/composition-api';
 import BehaviourTree from '../components/BehaviourTree.vue';
 import useBT from '../hooks/useBehaviourTree';
 import useBlackboards from '../hooks/useBlackboards';
 
 export default defineComponent({
   setup() {
-    const { startCountToBT, stopCountToBT } = useBT();
-    const {
-      currentNodeState,
-      currentCount,
-      targetCount,
-      reset,
-    } = useBlackboards();
-
-    const stateColour = computed(() => {
-      switch (currentNodeState.value) {
-        case NodeState.Success:
-          return 'bg-green-500';
-        case NodeState.Failure:
-          return 'bg-red-500';
-        case NodeState.Running:
-          return 'bg-orange-500';
-        default:
-          return 'bg-blue-500';
-      }
-    });
+    const { startCountToBT, stopCountToBT, currentNodeState } = useBT();
+    const { currentCount, targetCount, reset } = useBlackboards();
 
     return {
       start: startCountToBT,
       stop: stopCountToBT,
       reset,
-      stateColour,
+      currentNodeState,
       currentCount,
       targetCount,
     };

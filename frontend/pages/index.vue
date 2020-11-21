@@ -2,7 +2,7 @@
   <div class="container">
     <div>
       <h1 class="text-5xl">Nuxt Behaviour Tree Experiments</h1>
-      <BehaviourTree class="mt-12" />
+      <Slider class="mt-12" />
     </div>
   </div>
 </template>
