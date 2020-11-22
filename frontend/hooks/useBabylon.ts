@@ -1,4 +1,4 @@
-import { onMounted } from '@nuxtjs/composition-api';
+import { onMounted, ref } from '@nuxtjs/composition-api';
 import {
   Engine,
   Scene,
@@ -9,30 +9,36 @@ import {
   MeshBuilder,
 } from 'babylonjs';
 
+let app: App;
+const canvasRef = ref<HTMLCanvasElement>();
+
 class App {
-  private canvas: HTMLCanvasElement;
   private engine: Engine;
   private scene: Scene;
 
   constructor() {
-    this.Initialise();
-    this.ConfigureCamera();
-    this.ConfigureLight();
-    this.AddMeshs();
-    this.ConfigureEvents();
-    this.Render();
+    if (canvasRef.value) {
+      this.Initialise();
+      this.ConfigureCamera();
+      this.ConfigureLight();
+      this.AddMeshs();
+      this.ConfigureEvents();
+      this.Render();
+    }
   }
 
   private Initialise() {
-    // create the canvas html element and attach it to the webpage
-    this.canvas = document.createElement('canvas') as HTMLCanvasElement;
-    this.canvas.style.width = '100%';
-    this.canvas.style.height = '100%';
-    this.canvas.id = 'gameCanvas';
-    document.body.appendChild(this.canvas);
-    // initialize babylon scene and engine
-    this.engine = new Engine(this.canvas, true);
-    this.scene = new Scene(this.engine);
+    if (canvasRef.value) {
+      // create the canvas html element and attach it to the webpage
+      // this.canvas = document.createElement('canvas') as HTMLCanvasElement;
+      canvasRef.value.style.width = '100%';
+      canvasRef.value.style.height = '100%';
+      canvasRef.value.id = 'babylonCanvas';
+      // document.body.appendChild(this.canvas);
+      // initialize babylon scene and engine
+      this.engine = new Engine(canvasRef.value, true);
+      this.scene = new Scene(this.engine);
+    }
   }
 
   private ConfigureCamera() {
@@ -85,9 +91,10 @@ class App {
   }
 }
 
-let app: App;
-
 export default function () {
-  onMounted(() => (app = new App()));
-  return { app };
+  onMounted(() => {
+    app = new App();
+  });
+
+  return { app, canvasRef };
 }

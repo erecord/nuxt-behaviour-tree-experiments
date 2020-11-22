@@ -1,5 +1,5 @@
 <template>
-  <div />
+  <canvas ref="canvasRef" />
 </template>
 
 <script lang="ts">
@@ -8,8 +8,8 @@ import useBabylon from '../hooks/useBabylon';
 
 export default defineComponent({
   setup() {
-    useBabylon();
-    return {};
+    const { canvasRef } = useBabylon();
+    return { canvasRef };
   },
 });
 </script>
