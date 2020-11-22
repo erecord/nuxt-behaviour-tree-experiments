@@ -28,6 +28,7 @@
     "@nuxtjs/composition-api": "^0.15.0",
     "@nuxtjs/pwa": "^3.0.2",
     "@yoody/behaviour-tree": "^0.2.3",
+    "babylonjs": "^4.2.0",
     "core-js": "^3.6.5",
     "nuxt": "^2.14.6"
   },
