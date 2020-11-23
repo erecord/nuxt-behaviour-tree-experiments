@@ -81,7 +81,21 @@ class App {
     const box: Mesh = this.CreateBox();
     const roof: Mesh = this.CreateBoxRoof();
 
-    return Mesh.MergeMeshes([box, roof], true, false, undefined, false, true);
+    const house = Mesh.MergeMeshes(
+      [box, roof],
+      true,
+      false,
+      undefined,
+      false,
+      true
+    );
+    if (house) {
+      const clonedHouse = house.clone('clonedHouse');
+      clonedHouse.position.x = -2;
+      clonedHouse.position.z = -3.2;
+      clonedHouse.rotation.y = -Math.PI / 1.3;
+    }
+    return house;
   }
 
   private CreateGround() {
