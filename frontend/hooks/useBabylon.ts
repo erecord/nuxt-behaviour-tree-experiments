@@ -66,6 +66,7 @@ class App {
   private AddMesh() {
     this.AddGround();
     this.AddBox();
+    this.AddBoxRoof();
   }
 
   private AddGround() {
@@ -77,7 +78,7 @@ class App {
   }
 
   private AddBox() {
-    const box = MeshBuilder.CreateBox('box', {}, this.scene);
+    const box = MeshBuilder.CreateBox('box', { width: 3 }, this.scene);
     box.position.y = 0.5;
     box.rotation.y = Math.PI / 4;
   }
@@ -89,6 +90,21 @@ class App {
       this.scene
     );
     sphere.position.y = 0.5;
+  }
+
+  private AddBoxRoof() {
+    const roof = MeshBuilder.CreateCylinder(
+      'roof',
+      {
+        diameter: 1.3,
+        height: 1.2,
+        tessellation: 3,
+      },
+      this.scene
+    );
+    roof.scaling.x = 0.75;
+    roof.rotation.z = Math.PI / 2;
+    roof.position.y = 1.22;
   }
 
   private ConfigureEvents() {
