@@ -21,7 +21,8 @@ class App {
       this.Initialise();
       this.ConfigureCamera();
       this.ConfigureLight();
-      this.AddMeshs();
+      this.AddGround();
+      this.AddMesh();
       this.ConfigureEvents();
       this.Render();
     }
@@ -43,14 +44,15 @@ class App {
 
   private ConfigureCamera() {
     const camera: ArcRotateCamera = new ArcRotateCamera(
-      'Camera',
-      Math.PI / 2,
-      Math.PI / 2,
-      2,
-      Vector3.Zero(),
+      'camera',
+      -Math.PI / 2,
+      Math.PI / 2.5,
+      10,
+      new Vector3(0, 0, 0),
       this.scene
     );
-    camera.attachControl(this.canvas, true);
+    camera.position = new Vector3(5, 4, 0);
+    camera.attachControl(canvasRef.value, true);
   }
 
   private ConfigureLight() {
@@ -61,12 +63,32 @@ class App {
     );
   }
 
-  private AddMeshs() {
+  private AddMesh() {
+    this.AddGround();
+    this.AddBox();
+  }
+
+  private AddGround() {
+    const ground: Mesh = MeshBuilder.CreateGround(
+      'ground',
+      { width: 10, height: 10 },
+      this.scene
+    );
+  }
+
+  private AddBox() {
+    const box = MeshBuilder.CreateBox('box', {}, this.scene);
+    box.position.y = 0.5;
+    box.rotation.y = Math.PI / 4;
+  }
+
+  private AddSphere() {
     const sphere: Mesh = MeshBuilder.CreateSphere(
       'sphere',
       { diameter: 1 },
       this.scene
     );
+    sphere.position.y = 0.5;
   }
 
   private ConfigureEvents() {
