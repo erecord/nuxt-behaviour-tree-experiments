@@ -10,10 +10,17 @@ import {
   StandardMaterial,
   Color3,
   Texture,
+  Vector4,
 } from 'babylonjs';
 
 let app: App;
 const canvasRef = ref<HTMLCanvasElement>();
+
+const faceUV: Vector4[] = [];
+faceUV[0] = new Vector4(0.5, 0.0, 0.75, 1.0); // rear face
+faceUV[1] = new Vector4(0.0, 0.0, 0.25, 1.0); // front face
+faceUV[2] = new Vector4(0.25, 0, 0.5, 1.0); // right side
+faceUV[3] = new Vector4(0.75, 0, 1.0, 1.0); // left side
 
 class App {
   private engine: Engine;
@@ -83,7 +90,11 @@ class App {
   }
 
   private AddBox() {
-    const box = MeshBuilder.CreateBox('box', { width: 3 }, this.scene);
+    const box = MeshBuilder.CreateBox(
+      'box',
+      { width: 1, faceUV, wrap: true },
+      this.scene
+    );
     box.position.y = 0.5;
     box.rotation.y = Math.PI / 4;
 
@@ -111,6 +122,7 @@ class App {
     );
     roof.scaling.x = 0.75;
     roof.rotation.z = Math.PI / 2;
+    roof.rotation.y = -Math.PI / 4;
     roof.position.y = 1.22;
 
     this.ApplyRoofMaterial(roof);
@@ -134,7 +146,7 @@ class App {
   private ApplyBoxMaterial(mesh: Mesh) {
     const boxMat = new StandardMaterial('roofMat', this.scene);
     boxMat.diffuseTexture = new Texture(
-      'https://www.babylonjs-playground.com/textures/floor.png',
+      'https://doc.babylonjs.com/_next/image?url=%2Fimg%2Fgetstarted%2Fcubehouse.png&w=1080&q=75',
       this.scene
     );
     mesh.material = boxMat;
