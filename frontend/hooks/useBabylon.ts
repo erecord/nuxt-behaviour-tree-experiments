@@ -31,8 +31,7 @@ class App {
       this.Initialise();
       this.ConfigureCamera();
       this.ConfigureLight();
-      this.AddGround();
-      this.AddMesh();
+      this.CreateMesh();
       this.ConfigureEvents();
       this.Render();
     }
@@ -73,13 +72,19 @@ class App {
     );
   }
 
-  private AddMesh() {
-    this.AddGround();
-    this.AddBox();
-    this.AddBoxRoof();
+  private CreateMesh() {
+    this.CreateGround();
+    const house = this.CreateHouse();
   }
 
-  private AddGround() {
+  private CreateHouse() {
+    const box: Mesh = this.CreateBox();
+    const roof: Mesh = this.CreateBoxRoof();
+
+    return Mesh.MergeMeshes([box, roof], true, false, undefined, false, true);
+  }
+
+  private CreateGround() {
     const ground: Mesh = MeshBuilder.CreateGround(
       'ground',
       { width: 10, height: 10 },
@@ -89,7 +94,7 @@ class App {
     this.ApplyGroundMaterial(ground);
   }
 
-  private AddBox() {
+  private CreateBox() {
     const box = MeshBuilder.CreateBox(
       'box',
       { width: 1, faceUV, wrap: true },
@@ -99,6 +104,7 @@ class App {
     box.rotation.y = Math.PI / 4;
 
     this.ApplyBoxMaterial(box);
+    return box;
   }
 
   private AddSphere() {
@@ -110,7 +116,7 @@ class App {
     sphere.position.y = 0.5;
   }
 
-  private AddBoxRoof() {
+  private CreateBoxRoof() {
     const roof = MeshBuilder.CreateCylinder(
       'roof',
       {
@@ -126,6 +132,7 @@ class App {
     roof.position.y = 1.22;
 
     this.ApplyRoofMaterial(roof);
+    return roof;
   }
 
   private ApplyGroundMaterial(mesh: Mesh) {
