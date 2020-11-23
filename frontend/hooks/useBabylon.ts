@@ -7,6 +7,9 @@ import {
   HemisphericLight,
   Mesh,
   MeshBuilder,
+  StandardMaterial,
+  Color3,
+  Texture,
 } from 'babylonjs';
 
 let app: App;
@@ -75,12 +78,16 @@ class App {
       { width: 10, height: 10 },
       this.scene
     );
+
+    this.ApplyGroundMaterial(ground);
   }
 
   private AddBox() {
     const box = MeshBuilder.CreateBox('box', { width: 3 }, this.scene);
     box.position.y = 0.5;
     box.rotation.y = Math.PI / 4;
+
+    this.ApplyBoxMaterial(box);
   }
 
   private AddSphere() {
@@ -105,6 +112,32 @@ class App {
     roof.scaling.x = 0.75;
     roof.rotation.z = Math.PI / 2;
     roof.position.y = 1.22;
+
+    this.ApplyRoofMaterial(roof);
+  }
+
+  private ApplyGroundMaterial(mesh: Mesh) {
+    const groundMat = new StandardMaterial('groundMat', this.scene);
+    groundMat.diffuseColor = new Color3(0, 1, 0);
+    mesh.material = groundMat;
+  }
+
+  private ApplyRoofMaterial(mesh: Mesh) {
+    const roofMat = new StandardMaterial('roofMat', this.scene);
+    roofMat.diffuseTexture = new Texture(
+      'https://assets.babylonjs.com/environments/roof.jpg',
+      this.scene
+    );
+    mesh.material = roofMat;
+  }
+
+  private ApplyBoxMaterial(mesh: Mesh) {
+    const boxMat = new StandardMaterial('roofMat', this.scene);
+    boxMat.diffuseTexture = new Texture(
+      'https://www.babylonjs-playground.com/textures/floor.png',
+      this.scene
+    );
+    mesh.material = boxMat;
   }
 
   private ConfigureEvents() {
