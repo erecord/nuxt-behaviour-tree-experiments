@@ -11,6 +11,7 @@ import {
   Color3,
   Texture,
   Vector4,
+  TransformNode,
 } from 'babylonjs';
 
 let app: App;
@@ -74,28 +75,61 @@ class App {
 
   private CreateMesh() {
     this.CreateGround();
-    const house = this.CreateHouse();
+
+    const box = this.BuildBox('box', 1);
+
+    const node = this.BuildTransformNode('node', box);
+
+    this.ApplyRotationEachFrame(node, 0.01);
+
+    this.ApplySineWave(node, 0.05);
   }
 
-  private CreateHouse() {
-    const box: Mesh = this.CreateBox();
-    const roof: Mesh = this.CreateBoxRoof();
+  private lookupX(input: number) {
+    return Math.sin(input);
+  }
 
-    const house = Mesh.MergeMeshes(
-      [box, roof],
-      true,
-      false,
-      undefined,
-      false,
-      true
-    );
-    if (house) {
-      const clonedHouse = house.clone('clonedHouse');
-      clonedHouse.position.x = -2;
-      clonedHouse.position.z = -3.2;
-      clonedHouse.rotation.y = -Math.PI / 1.3;
+  private sineWave() {
+    for (let i = 0; i < 100; i++) {
+      console.log(this.lookupX(i));
     }
-    return house;
+  }
+
+  private ApplySineWave(node: TransformNode, incrementValue: number) {
+    let y = 0;
+    this.scene.registerBeforeRender(() => {
+      node.position.y = this.lookupX(y) * 5 + 10;
+      y += incrementValue;
+    });
+  }
+
+  private BuildBox(name: string, width: number, height: number = width) {
+    const box = MeshBuilder.CreateBox(
+      name,
+      { width, height, faceUV, wrap: true },
+      this.scene
+    );
+    box.position.y = 0.5;
+    // box.rotation.y = Math.PI / 4;
+
+    // this.ApplyBoxMaterial(box);
+    return box;
+  }
+
+  private ApplyRotationEachFrame(mesh: TransformNode, radians: number = 0.01) {
+    // Animation
+    let angle = 0;
+    this.scene.registerBeforeRender(function () {
+      mesh.rotation.y = angle;
+      angle += radians;
+    });
+  }
+
+  private BuildTransformNode(name: string, child: Mesh) {
+    // create a Center of Transformation
+    const CoT = new TransformNode(name, this.scene);
+    child.parent = CoT; // apply to Box
+    return CoT;
   }
 
   private CreateGround() {
@@ -108,69 +142,10 @@ class App {
     this.ApplyGroundMaterial(ground);
   }
 
-  private CreateBox() {
-    const box = MeshBuilder.CreateBox(
-      'box',
-      { width: 1, faceUV, wrap: true },
-      this.scene
-    );
-    box.position.y = 0.5;
-    box.rotation.y = Math.PI / 4;
-
-    this.ApplyBoxMaterial(box);
-    return box;
-  }
-
-  private AddSphere() {
-    const sphere: Mesh = MeshBuilder.CreateSphere(
-      'sphere',
-      { diameter: 1 },
-      this.scene
-    );
-    sphere.position.y = 0.5;
-  }
-
-  private CreateBoxRoof() {
-    const roof = MeshBuilder.CreateCylinder(
-      'roof',
-      {
-        diameter: 1.3,
-        height: 1.2,
-        tessellation: 3,
-      },
-      this.scene
-    );
-    roof.scaling.x = 0.75;
-    roof.rotation.z = Math.PI / 2;
-    roof.rotation.y = -Math.PI / 4;
-    roof.position.y = 1.22;
-
-    this.ApplyRoofMaterial(roof);
-    return roof;
-  }
-
   private ApplyGroundMaterial(mesh: Mesh) {
     const groundMat = new StandardMaterial('groundMat', this.scene);
-    groundMat.diffuseColor = new Color3(0, 1, 0);
+    groundMat.diffuseColor = new Color3(0.2, 0.5, 0.9);
     mesh.material = groundMat;
-  }
-
-  private ApplyRoofMaterial(mesh: Mesh) {
-    const roofMat = new StandardMaterial('roofMat', this.scene);
-    roofMat.diffuseTexture = new Texture(
-      'https://assets.babylonjs.com/environments/roof.jpg',
-      this.scene
-    );
-    mesh.material = roofMat;
-  }
-
-  private ApplyBoxMaterial(mesh: Mesh) {
-    const boxMat = new StandardMaterial('roofMat', this.scene);
-    boxMat.diffuseTexture = new Texture(
-      'https://doc.babylonjs.com/_next/image?url=%2Fimg%2Fgetstarted%2Fcubehouse.png&w=1080&q=75',
-      this.scene
-    );
-    mesh.material = boxMat;
   }
 
   private ConfigureEvents() {
@@ -195,10 +170,10 @@ class App {
   }
 }
 
-export default function () {
+export default () => {
   onMounted(() => {
     app = new App();
   });
 
   return { app, canvasRef };
-}
+};

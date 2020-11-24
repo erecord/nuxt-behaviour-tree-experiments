@@ -4,11 +4,11 @@
 
 <script lang="ts">
 import { defineComponent } from '@nuxtjs/composition-api';
-import useBabylon from '../hooks/useBabylon';
+import useTransformNode from '../hooks/useBabylon/useTransformNode';
 
 export default defineComponent({
   setup() {
-    const { canvasRef } = useBabylon();
+    const { canvasRef } = useTransformNode();
     return { canvasRef };
   },
 });
