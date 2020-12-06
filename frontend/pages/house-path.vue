@@ -4,7 +4,7 @@
 
 <script lang="ts">
 import { defineComponent } from '@nuxtjs/composition-api';
-import scene from '../scenes/MovingBoxesWithTrigFunctions';
+import scene from '../scenes/ModellingHouseAndPath';
 
 export default defineComponent({
   setup() {
