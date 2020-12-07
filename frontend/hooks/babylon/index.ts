@@ -9,6 +9,7 @@ import useDTOBuilder from './DTOBuilder';
 import useApplyMaterial from './ApplyMaterial';
 import useApplyWaves from './ApplyWaves';
 import useApplyEvents from './ApplyEvents';
+import useActionManager from './ActionManager';
 
 const canvasRef = ref<HTMLCanvasElement>();
 const engineRef = ref<Engine>();
@@ -51,5 +52,6 @@ export default function () {
     useCameraBuilder,
     useApplyWaves,
     useDTOBuilder,
+    useActionManager,
   };
 }
