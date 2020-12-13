@@ -1,4 +1,4 @@
-import { ref, Ref } from '@nuxtjs/composition-api';
+import { onUnmounted, ref, Ref } from '@nuxtjs/composition-api';
 import {
   ActionNode,
   NodeState,
@@ -18,9 +18,9 @@ enum TrafficLightEnum {
 interface ITrafficLightBlackboard {
   trafficLightState: Ref<TrafficLightEnum>;
   changeColorDelay: Ref<number>;
-  startBehaviourTree: Function;
-  stopBehaviourTree: Function;
   nodeState: Ref<NodeState | undefined>;
+  start(): void;
+  stop(): void;
 }
 // Behaviour Tree
 
@@ -73,24 +73,19 @@ const yellow = new SequenceNode([
 ]);
 const red = new SequenceNode([displayRedCondition, setTrafficLightRedAction]);
 
-const trafficLightSequence = new SelectorNode([green, yellow, red]);
+const trafficLightSequence = new SelectorNode([green, yellow, red, yellow]);
 
 const repeatUntilFailureNode = new RepeatUntilFailureNode(trafficLightSequence);
 
 const trafficLightState = ref<TrafficLightEnum>(TrafficLightEnum.Red);
 const changeColorDelay = ref<number>(1500);
-
-// Methods
-const stop = () => (shouldStop = true);
-
 const nodeState = ref<NodeState>();
+const runningState = ref<boolean>(false);
 
-let shouldStop = false;
-
-const useMemory = (): ITrafficLightBlackboard => {
+const useTreeContext = (): ITrafficLightBlackboard => {
   return {
-    startBehaviourTree: start,
-    stopBehaviourTree: stop,
+    start,
+    stop,
     nodeState,
     trafficLightState,
     changeColorDelay,
@@ -100,23 +95,36 @@ const useMemory = (): ITrafficLightBlackboard => {
 const waitForDelay = (ms: number) =>
   new Promise((resolve) => setTimeout(resolve, ms));
 
-const start = async () => {
+const start = () => {
+  const treeNotCurrentlyRunning = !runningState.value;
+  if (treeNotCurrentlyRunning) {
+    runningState.value = true;
+    tickUntilStopped();
+  }
+};
+const stop = () => {
+  runningState.value = false;
+};
+
+const tickUntilStopped = async () => {
   // interval = setInterval(() => {
   //   nodeState.value = repeatUntilFailureNode.tick(memory);
   //   if (shouldStop()) stop();
   // }, POLLING_DELAY);
 
-  if (!shouldStop) {
-    nodeState.value = repeatUntilFailureNode.tick(useMemory());
+  if (runningState.value) {
+    nodeState.value = repeatUntilFailureNode.tick(useTreeContext());
+
     if (nodeState.value !== NodeState.Failure) {
       await waitForDelay(changeColorDelay.value);
-      start();
+      tickUntilStopped();
+    } else {
+      stop();
     }
-  } else {
-    shouldStop = false;
   }
 };
 
 export default function (): ITrafficLightBlackboard {
-  return useMemory();
+  onUnmounted(() => stop());
+  return useTreeContext();
 }

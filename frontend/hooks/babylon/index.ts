@@ -1,4 +1,4 @@
-import { ref } from '@nuxtjs/composition-api';
+import { onUnmounted, ref } from '@nuxtjs/composition-api';
 import { Engine, Scene } from 'babylonjs';
 
 import useCameraBuilder from './CameraBuilder';
@@ -8,7 +8,6 @@ import useDTOBuilder from './DTOBuilder';
 
 import useApplyMaterial from './ApplyMaterial';
 import useApplyWaves from './ApplyWaves';
-import useApplyEvents from './ApplyEvents';
 import useActionManager from './ActionManager';
 
 const canvasRef = ref<HTMLCanvasElement>();
@@ -21,14 +20,23 @@ export default function () {
     ConfigureCanvas();
     ConfigureBabylon();
     // ConfigureEvents();
+
+    window.addEventListener('resize', resizeBabylon);
     Render();
   };
 
+  onUnmounted(() => {
+    window.removeEventListener('resize', resizeBabylon);
+  });
+
   const ConfigureCanvas = () => {
-    canvasRef.value!.style.width = '100vw';
-    canvasRef.value!.style.height = '100vh';
+    // canvasRef.value!.style.width = '100%';
+    // canvasRef.value!.style.height = '100%';
+    // canvasRef.value!.style.maxHeight = '100%';
     canvasRef.value!.id = 'babylonCanvas';
   };
+
+  const resizeBabylon = () => engineRef.value?.resize();
 
   const ConfigureBabylon = () => {
     engineRef.value = new Engine(canvasRef.value!, true);
