@@ -16,7 +16,11 @@ export default () => {
     useDTOBuilder,
   } = useBabylon();
 
-  const { trafficLightState, startBehaviourTree, stopBehaviourTree } = useBT();
+  const {
+    trafficLightState,
+    start: startBehaviourTree,
+    stop: stopBehaviourTree,
+  } = useBT();
 
   const { BuildArcRotateCamera } = useCameraBuilder();
   const { BuildGround, BuildBox } = useMeshBuilder();
