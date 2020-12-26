@@ -30,6 +30,7 @@
     "@yoody/behaviour-tree": "^0.2.3",
     "babylonjs": "^4.2.0",
     "core-js": "^3.6.5",
+    "lodash": "^4.17.20",
     "nuxt": "^2.14.6"
   },
   "devDependencies": {
