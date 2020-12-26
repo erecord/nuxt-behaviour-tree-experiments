@@ -1,7 +1,7 @@
-import { computed, onMounted } from '@nuxtjs/composition-api';
+import { onMounted } from '@nuxtjs/composition-api';
 import { Color3, StandardMaterial } from 'babylonjs';
 import useBabylon from '../hooks/babylon';
-import useBT from '../trees/useChangeTrafficLightTree';
+import useBT, { TrafficLightEnum } from '../trees/useChangeTrafficLightTree';
 
 export default () => {
   const {
@@ -12,7 +12,6 @@ export default () => {
     useLightBuilder,
     useCameraBuilder,
     useApplyMaterial,
-    useApplyWaves,
     useDTOBuilder,
   } = useBabylon();
 
@@ -20,17 +19,26 @@ export default () => {
     trafficLightState,
     start: startBehaviourTree,
     stop: stopBehaviourTree,
+    tick,
+    nodeState,
+    colorSequence,
   } = useBT();
 
   const { BuildArcRotateCamera } = useCameraBuilder();
   const { BuildGround, BuildBox } = useMeshBuilder();
   const { BuildHemisphericLight } = useLightBuilder();
   const { ApplyGroundMaterial } = useApplyMaterial();
-  const { ApplySineWave, ApplyCosineWave, ApplyTanWave } = useApplyWaves();
   const { BuildVector3 } = useDTOBuilder();
 
   onMounted(() => {
     onHTMLReady();
+
+    colorSequence.value = [
+      TrafficLightEnum.Green,
+      TrafficLightEnum.Amber,
+      TrafficLightEnum.Red,
+      TrafficLightEnum.Amber,
+    ];
 
     BuildArcRotateCamera(
       -Math.PI / 2,
@@ -45,7 +53,7 @@ export default () => {
     ApplyGroundMaterial(ground);
 
     const box = BuildBox(BuildVector3(0, 0.5, 0), 1);
-    startBehaviourTree();
+    // startBehaviourTree();
 
     const color = new StandardMaterial('color', sceneRef.value!);
     sceneRef.value?.onBeforeRenderObservable.add(() => {
@@ -55,5 +63,11 @@ export default () => {
     });
   });
 
-  return { canvasRef };
+  return {
+    canvasRef,
+    tick,
+    nodeState,
+    start: startBehaviourTree,
+    stop: stopBehaviourTree,
+  };
 };

@@ -1,39 +1,28 @@
 <template>
   <div>
-    <Button :text="'Start'" @click="start" />
-    <Button :text="'Stop'" @click="stop" />
-    <Button :text="'Reset'" @click="reset" />
-
-    <TreeState :current-node-state="currentNodeState" />
-    <div class="flex justify-center items-center mt-4">
-      <p>Current Count {{ currentCount }}</p>
-    </div>
-    <div class="flex justify-center items-center gap-2 mt-4">
-      <p>Target Count</p>
-      <input v-model="targetCount" class="w-10 border border-gray-400" />
+    <div v-for="(child, index) in parent.children" :key="index">
+      {{ child }}
     </div>
   </div>
 </template>
 
 <script lang="ts">
+// Recursive
+// A reference to children, who also have a refernce to the parent
 import { defineComponent } from '@nuxtjs/composition-api';
-import BehaviourTree from '../components/BehaviourTree.vue';
-import useBT from '../hooks/useBehaviourTree';
-import useBlackboards from '../hooks/useBlackboards';
+import trafficLightBT from '../trees/useChangeTrafficLightTree';
 
+interface INode {
+  parent?: INode;
+  children?: INode[];
+}
+
+const child1: INode = {};
+const child2: INode = {};
+const parent: INode = { children: [child1, child2] };
 export default defineComponent({
   setup() {
-    const { startCountToBT, stopCountToBT, currentNodeState } = useBT();
-    const { currentCount, targetCount, reset } = useBlackboards();
-
-    return {
-      start: startCountToBT,
-      stop: stopCountToBT,
-      reset,
-      currentNodeState,
-      currentCount,
-      targetCount,
-    };
+    return { parent };
   },
 });
 </script>

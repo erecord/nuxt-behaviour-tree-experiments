@@ -8,7 +8,9 @@
     <div class="flex-grow">
       <button class="" @click="start">Start</button>
       <button class="" @click="stop">Stop</button>
+      <button class="" @click="tick">Tick</button>
       <Slider :default="babylonCanvasHeight" @input="handleSliderInputEvent" />
+      <TreeState :current-node-state="nodeState" />
     </div>
   </div>
 </template>
@@ -19,7 +21,7 @@ import scene from '../scenes/BehaviourTree';
 
 export default defineComponent({
   setup() {
-    const { canvasRef, start, stop } = scene();
+    const { canvasRef, stop, start, tick, nodeState } = scene();
 
     const babylonCanvasHeight = ref<number>(55);
 
@@ -32,7 +34,9 @@ export default defineComponent({
     return {
       canvasRef,
       start,
+      nodeState,
       stop,
+      tick,
       babylonCanvasHeight,
       handleSliderInputEvent,
     };
