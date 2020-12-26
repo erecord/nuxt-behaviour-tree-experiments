@@ -11,9 +11,10 @@
       <button class="" @click="tick">Tick</button>
       <Slider :default="babylonCanvasHeight" @input="handleSliderInputEvent" />
       <TreeState :current-node-state="nodeState" />
-      <ColourSequenceVisualiser
-        :colour-sequence="colorSequence"
+      <ColorSequenceVisualiser
+        :color-sequence="colorSequence"
         :active-index="activeIndex"
+        @remove-color="onRemoveColor"
       />
     </div>
   </div>
@@ -22,18 +23,22 @@
 <script lang="ts">
 import { defineComponent, ref } from '@nuxtjs/composition-api';
 import scene from '../scenes/BehaviourTree';
+import useChangeTrafficLightTree from '~/trees/useChangeTrafficLightTree';
 
 export default defineComponent({
   setup() {
+    const { canvasRef } = scene();
+
     const {
-      canvasRef,
-      stop,
       start,
-      tick,
-      nodeState,
+      stop,
       colorSequence,
+      nodeState,
       activeIndex,
-    } = scene();
+      tick,
+    } = useChangeTrafficLightTree();
+
+    const onRemoveColor = () => {};
 
     const babylonCanvasHeight = ref<number>(55);
 
@@ -53,6 +58,7 @@ export default defineComponent({
       handleSliderInputEvent,
       colorSequence,
       activeIndex,
+      onRemoveColor,
     };
   },
 });

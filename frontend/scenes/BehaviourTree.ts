@@ -15,15 +15,7 @@ export default () => {
     useDTOBuilder,
   } = useBabylon();
 
-  const {
-    trafficLightState,
-    start: startBehaviourTree,
-    stop: stopBehaviourTree,
-    tick,
-    nodeState,
-    colorSequence,
-    activeIndex,
-  } = useBT();
+  const { trafficLightState, colorSequence } = useBT();
 
   const { BuildArcRotateCamera } = useCameraBuilder();
   const { BuildGround, BuildBox } = useMeshBuilder();
@@ -66,11 +58,5 @@ export default () => {
 
   return {
     canvasRef,
-    tick,
-    colorSequence,
-    activeIndex,
-    nodeState,
-    start: startBehaviourTree,
-    stop: stopBehaviourTree,
   };
 };
