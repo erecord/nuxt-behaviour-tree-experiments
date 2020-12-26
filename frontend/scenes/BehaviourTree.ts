@@ -66,6 +66,7 @@ export default () => {
   return {
     canvasRef,
     tick,
+    colorSequence,
     nodeState,
     start: startBehaviourTree,
     stop: stopBehaviourTree,

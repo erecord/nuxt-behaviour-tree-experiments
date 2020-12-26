@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col h-screen w-screen">
+  <div class="flex flex-col h-screen w-screen bg-green-400">
     <canvas
       ref="canvasRef"
       class="flex-shrink"
@@ -11,6 +11,10 @@
       <button class="" @click="tick">Tick</button>
       <Slider :default="babylonCanvasHeight" @input="handleSliderInputEvent" />
       <TreeState :current-node-state="nodeState" />
+      <ColourSequenceVisualiser
+        :colour-sequence="colorSequence"
+        :active-index="2"
+      />
     </div>
   </div>
 </template>
@@ -21,7 +25,7 @@ import scene from '../scenes/BehaviourTree';
 
 export default defineComponent({
   setup() {
-    const { canvasRef, stop, start, tick, nodeState } = scene();
+    const { canvasRef, stop, start, tick, nodeState, colorSequence } = scene();
 
     const babylonCanvasHeight = ref<number>(55);
 
@@ -39,6 +43,7 @@ export default defineComponent({
       tick,
       babylonCanvasHeight,
       handleSliderInputEvent,
+      colorSequence,
     };
   },
 });
