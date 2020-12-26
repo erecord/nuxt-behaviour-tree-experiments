@@ -124,8 +124,6 @@ const useTreeContext = (): ITrafficLightBlackboard => {
 };
 
 const activeIndex = computed(() => {
-  console.log('Actions Performed Count: ' + actionsPerformedCount.value);
-
   const nextIndex = actionsPerformedCount.value;
   const activeIndex = (nextIndex - 1) % colorSequence.value.length;
   return activeIndex;
