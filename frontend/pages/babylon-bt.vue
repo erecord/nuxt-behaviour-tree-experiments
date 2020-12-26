@@ -13,7 +13,7 @@
       <TreeState :current-node-state="nodeState" />
       <ColourSequenceVisualiser
         :colour-sequence="colorSequence"
-        :active-index="2"
+        :active-index="activeIndex"
       />
     </div>
   </div>
@@ -25,7 +25,15 @@ import scene from '../scenes/BehaviourTree';
 
 export default defineComponent({
   setup() {
-    const { canvasRef, stop, start, tick, nodeState, colorSequence } = scene();
+    const {
+      canvasRef,
+      stop,
+      start,
+      tick,
+      nodeState,
+      colorSequence,
+      activeIndex,
+    } = scene();
 
     const babylonCanvasHeight = ref<number>(55);
 
@@ -44,6 +52,7 @@ export default defineComponent({
       babylonCanvasHeight,
       handleSliderInputEvent,
       colorSequence,
+      activeIndex,
     };
   },
 });

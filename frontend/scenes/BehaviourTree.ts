@@ -22,6 +22,7 @@ export default () => {
     tick,
     nodeState,
     colorSequence,
+    activeIndex,
   } = useBT();
 
   const { BuildArcRotateCamera } = useCameraBuilder();
@@ -67,6 +68,7 @@ export default () => {
     canvasRef,
     tick,
     colorSequence,
+    activeIndex,
     nodeState,
     start: startBehaviourTree,
     stop: stopBehaviourTree,

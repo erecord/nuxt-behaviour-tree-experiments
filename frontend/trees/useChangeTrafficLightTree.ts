@@ -5,6 +5,7 @@ import {
   ref,
   Ref,
 } from '@nuxtjs/composition-api';
+
 import {
   ActionNode,
   NodeState,
@@ -22,23 +23,6 @@ export enum TrafficLightEnum {
   White = '#ffffff',
 }
 
-// const order = ref<TrafficLightEnum[]>([
-//   TrafficLightEnum.Green,
-//   TrafficLightEnum.Amber,
-//   TrafficLightEnum.Red,
-//   TrafficLightEnum.Amber,
-//   TrafficLightEnum.Red,
-//   TrafficLightEnum.Green,
-//   TrafficLightEnum.Red,
-// ]);
-
-// const order = ref<TrafficLightEnum[]>([
-//   TrafficLightEnum.Green,
-//   TrafficLightEnum.Amber,
-//   TrafficLightEnum.Red,
-//   TrafficLightEnum.Amber,
-//   // TrafficLightEnum.Amber,
-// ]);
 const actionsPerformedCount = ref<number>(0);
 
 const trafficLightState = ref<TrafficLightEnum>(TrafficLightEnum.White);
@@ -46,8 +30,6 @@ const trafficLightState = ref<TrafficLightEnum>(TrafficLightEnum.White);
 const nodeState = ref<NodeState>();
 const runningState = ref<boolean>(false);
 const colorSequence = ref<TrafficLightEnum[]>([]);
-
-const colourSequenceLength = computed(() => colorSequence.value.length);
 
 // Blackboard
 interface ITrafficLightBlackboard {
@@ -58,6 +40,7 @@ interface ITrafficLightBlackboard {
   stop(): void;
   tick(): NodeState;
   colorSequence: Ref<TrafficLightEnum[]>;
+  activeIndex: Ref<number>;
 }
 // Behaviour Tree
 // ##############
@@ -65,8 +48,7 @@ interface ITrafficLightBlackboard {
 const setTrafficLightGreenAction = new ActionNode<ITrafficLightBlackboard>(
   ({ trafficLightState }) => {
     console.log('Green');
-    actionsPerformedCount.value++;
-
+    incrementActionsPerformed();
     trafficLightState.value = TrafficLightEnum.Green;
     return NodeState.Success;
   }
@@ -74,7 +56,7 @@ const setTrafficLightGreenAction = new ActionNode<ITrafficLightBlackboard>(
 const setTrafficLightYellowAction = new ActionNode<ITrafficLightBlackboard>(
   ({ trafficLightState }) => {
     console.log('Amber');
-    actionsPerformedCount.value++;
+    incrementActionsPerformed();
     trafficLightState.value = TrafficLightEnum.Amber;
     return NodeState.Success;
   }
@@ -82,7 +64,7 @@ const setTrafficLightYellowAction = new ActionNode<ITrafficLightBlackboard>(
 const setTrafficLightRedAction = new ActionNode<ITrafficLightBlackboard>(
   ({ trafficLightState }) => {
     console.log('Red');
-    actionsPerformedCount.value++;
+    incrementActionsPerformed();
     trafficLightState.value = TrafficLightEnum.Red;
     return NodeState.Success;
   }
@@ -90,27 +72,27 @@ const setTrafficLightRedAction = new ActionNode<ITrafficLightBlackboard>(
 // Conditions
 const greenShouldShow = new ConditionNode<ITrafficLightBlackboard>(
   ({ colorSequence }) => {
-    const colourSequenceIndex =
-      actionsPerformedCount.value % colourSequenceLength.value;
-    return colorSequence.value[colourSequenceIndex] === TrafficLightEnum.Green;
+    const colorSequenceIndex = getColorSequenceIndex();
+    return colorSequence.value[colorSequenceIndex] === TrafficLightEnum.Green;
   }
 );
 
 const amberShouldShow = new ConditionNode<ITrafficLightBlackboard>(
   ({ colorSequence }) => {
-    const colourSequenceIndex =
-      actionsPerformedCount.value % colourSequenceLength.value;
-    return colorSequence.value[colourSequenceIndex] === TrafficLightEnum.Amber;
+    const colorSequenceIndex = getColorSequenceIndex();
+    return colorSequence.value[colorSequenceIndex] === TrafficLightEnum.Amber;
   }
 );
 
 const redShouldShow = new ConditionNode<ITrafficLightBlackboard>(
   ({ colorSequence }) => {
-    const colourSequenceIndex =
-      actionsPerformedCount.value % colourSequenceLength.value;
-    return colorSequence.value[colourSequenceIndex] === TrafficLightEnum.Red;
+    const colorSequenceIndex = getColorSequenceIndex();
+    return colorSequence.value[colorSequenceIndex] === TrafficLightEnum.Red;
   }
 );
+
+const getColorSequenceIndex = () =>
+  actionsPerformedCount.value % colorSequence.value.length;
 
 // Timer before action
 const setGreen = new TimerNode(1000, setTrafficLightGreenAction);
@@ -137,8 +119,17 @@ const useTreeContext = (): ITrafficLightBlackboard => {
     // changeColorDelay,
     tick,
     colorSequence,
+    activeIndex,
   };
 };
+
+const activeIndex = computed(() => {
+  console.log('Actions Performed Count: ' + actionsPerformedCount.value);
+
+  const nextIndex = actionsPerformedCount.value;
+  const activeIndex = (nextIndex - 1) % colorSequence.value.length;
+  return activeIndex;
+});
 
 const waitForDelay = (ms: number) =>
   new Promise((resolve) => setTimeout(resolve, ms));
@@ -157,8 +148,16 @@ const shouldStop = () => nodeState.value !== NodeState.Failure;
 
 const tick = () => {
   console.info('Tick');
-
+  if (!runningState.value) {
+    runningState.value = true;
+  }
   return repeatUntilFailureNode.tick(useTreeContext());
+};
+
+const incrementActionsPerformed = () => {
+  if (runningState.value) {
+    actionsPerformedCount.value++;
+  }
 };
 
 const tickUntilStopped = async () => {
@@ -183,6 +182,7 @@ const tickUntilStopped = async () => {
 export default function (): ITrafficLightBlackboard {
   onMounted(() => {
     const { trafficLightState } = useTreeContext();
+    actionsPerformedCount.value = 0;
     trafficLightState.value = TrafficLightEnum.White;
   });
   onUnmounted(() => stop());

@@ -7,9 +7,10 @@
           ${index === activeIndex ? 'border-4 border-yellow-400' : ''}`"
           :style="{ backgroundColor: colour }"
         >
-          <!-- <div>
-            {{ colour }}
-          </div> -->
+          <div>
+            <!-- {{ colour }} -->
+            {{ activeIndex }}
+          </div>
         </div>
       </div>
       <!-- {{ colour }} -->
