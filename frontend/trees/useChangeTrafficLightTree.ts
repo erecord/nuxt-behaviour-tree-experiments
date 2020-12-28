@@ -16,31 +16,36 @@ import {
   TimerNode,
 } from '@yoody/behaviour-tree';
 
-export enum TrafficLightEnum {
+export enum ColorsEnum {
   Green = '#2dc937',
   Amber = '#db7b2b',
   Red = '#cc3232',
   White = '#ffffff',
 }
+export interface IColorEntity {
+  id: Number;
+  color: String;
+}
 
 const actionsPerformedCount = ref<number>(0);
 
-const trafficLightState = ref<TrafficLightEnum>(TrafficLightEnum.White);
+const trafficLightState = ref<string>(ColorsEnum.White);
 // const changeColorDelay = ref<number>(1500);
-const nodeState = ref<NodeState>();
+const nodeState = ref<NodeState>(NodeState.Idle);
 const runningState = ref<boolean>(false);
-const colorSequence = ref<TrafficLightEnum[]>([]);
+const colorSequence = ref<IColorEntity[]>([]);
 
 // Blackboard
 interface ITrafficLightBlackboard {
-  trafficLightState: Ref<TrafficLightEnum>;
+  trafficLightState: Ref<string>;
   // changeColorDelay: Ref<number>;
-  nodeState: Ref<NodeState | undefined>;
+  nodeState: Ref<NodeState>;
   start(): void;
   stop(): void;
   tick(): NodeState;
-  colorSequence: Ref<TrafficLightEnum[]>;
+  colorSequence: Ref<IColorEntity[]>;
   activeIndex: Ref<number>;
+  onRemoveColor: Function;
 }
 // Behaviour Tree
 // ##############
@@ -49,7 +54,7 @@ const setTrafficLightGreenAction = new ActionNode<ITrafficLightBlackboard>(
   ({ trafficLightState }) => {
     console.log('Green');
     incrementActionsPerformed();
-    trafficLightState.value = TrafficLightEnum.Green;
+    trafficLightState.value = ColorsEnum.Green;
     return NodeState.Success;
   }
 );
@@ -57,7 +62,7 @@ const setTrafficLightYellowAction = new ActionNode<ITrafficLightBlackboard>(
   ({ trafficLightState }) => {
     console.log('Amber');
     incrementActionsPerformed();
-    trafficLightState.value = TrafficLightEnum.Amber;
+    trafficLightState.value = ColorsEnum.Amber;
     return NodeState.Success;
   }
 );
@@ -65,7 +70,7 @@ const setTrafficLightRedAction = new ActionNode<ITrafficLightBlackboard>(
   ({ trafficLightState }) => {
     console.log('Red');
     incrementActionsPerformed();
-    trafficLightState.value = TrafficLightEnum.Red;
+    trafficLightState.value = ColorsEnum.Red;
     return NodeState.Success;
   }
 );
@@ -73,21 +78,21 @@ const setTrafficLightRedAction = new ActionNode<ITrafficLightBlackboard>(
 const greenShouldShow = new ConditionNode<ITrafficLightBlackboard>(
   ({ colorSequence }) => {
     const colorSequenceIndex = getColorSequenceIndex();
-    return colorSequence.value[colorSequenceIndex] === TrafficLightEnum.Green;
+    return colorSequence.value[colorSequenceIndex].color === ColorsEnum.Green;
   }
 );
 
 const amberShouldShow = new ConditionNode<ITrafficLightBlackboard>(
   ({ colorSequence }) => {
     const colorSequenceIndex = getColorSequenceIndex();
-    return colorSequence.value[colorSequenceIndex] === TrafficLightEnum.Amber;
+    return colorSequence.value[colorSequenceIndex].color === ColorsEnum.Amber;
   }
 );
 
 const redShouldShow = new ConditionNode<ITrafficLightBlackboard>(
   ({ colorSequence }) => {
     const colorSequenceIndex = getColorSequenceIndex();
-    return colorSequence.value[colorSequenceIndex] === TrafficLightEnum.Red;
+    return colorSequence.value[colorSequenceIndex].color === ColorsEnum.Red;
   }
 );
 
@@ -120,6 +125,7 @@ const useTreeContext = (): ITrafficLightBlackboard => {
     tick,
     colorSequence,
     activeIndex,
+    onRemoveColor,
   };
 };
 
@@ -177,11 +183,25 @@ const tickUntilStopped = async () => {
   }
 };
 
+const onRemoveColor = (colorEntity: IColorEntity) => {
+  console.log(colorEntity);
+
+  const newColorSequence = colorSequence.value.filter(
+    (color) => color.id !== colorEntity.id
+  );
+
+  colorSequence.value = newColorSequence;
+};
+
 export default function (): ITrafficLightBlackboard {
+  const c = computed(() => {
+    console.log(colorSequence.value);
+  });
+
   onMounted(() => {
     const { trafficLightState } = useTreeContext();
     actionsPerformedCount.value = 0;
-    trafficLightState.value = TrafficLightEnum.White;
+    trafficLightState.value = ColorsEnum.White;
   });
   onUnmounted(() => stop());
   return useTreeContext();

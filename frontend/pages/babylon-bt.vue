@@ -22,7 +22,7 @@
 
 <script lang="ts">
 import { defineComponent, ref } from '@nuxtjs/composition-api';
-import scene from '../scenes/BehaviourTree';
+import scene from '../scenes/CubeColorChangerScene';
 import useChangeTrafficLightTree from '~/trees/useChangeTrafficLightTree';
 
 export default defineComponent({
@@ -36,9 +36,8 @@ export default defineComponent({
       nodeState,
       activeIndex,
       tick,
+      onRemoveColor,
     } = useChangeTrafficLightTree();
-
-    const onRemoveColor = () => {};
 
     const babylonCanvasHeight = ref<number>(55);
 
