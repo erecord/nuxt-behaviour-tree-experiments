@@ -36,10 +36,10 @@ export default () => {
       ColorsEnum.Amber,
     ];
 
-    const colorEntities = colors.map((color, index) => ({
+    const colorEntities: IColorEntity[] = colors.map((color, index) => ({
       id: index,
       color,
-    })) as IColorEntity[];
+    }));
 
     colorSequence.value = colorEntities;
 

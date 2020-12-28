@@ -31,7 +31,7 @@ const actionsPerformedCount = ref<number>(0);
 
 const trafficLightState = ref<string>(ColorsEnum.White);
 // const changeColorDelay = ref<number>(1500);
-const nodeState = ref<NodeState>(NodeState.Idle);
+const nodeState = ref<NodeState>();
 const runningState = ref<boolean>(false);
 const colorSequence = ref<IColorEntity[]>([]);
 
@@ -39,7 +39,7 @@ const colorSequence = ref<IColorEntity[]>([]);
 interface ITrafficLightBlackboard {
   trafficLightState: Ref<string>;
   // changeColorDelay: Ref<number>;
-  nodeState: Ref<NodeState>;
+  nodeState: Ref<NodeState | undefined>;
   start(): void;
   stop(): void;
   tick(): NodeState;
@@ -194,10 +194,6 @@ const onRemoveColor = (colorEntity: IColorEntity) => {
 };
 
 export default function (): ITrafficLightBlackboard {
-  const c = computed(() => {
-    console.log(colorSequence.value);
-  });
-
   onMounted(() => {
     const { trafficLightState } = useTreeContext();
     actionsPerformedCount.value = 0;
