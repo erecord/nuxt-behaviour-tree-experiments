@@ -152,8 +152,8 @@ const start = () => {
   const treeNotCurrentlyRunning = !runningState.value;
   if (treeNotCurrentlyRunning) {
     runningState.value = true;
-    tickUntilStopped();
   }
+  tickUntilStopped();
 };
 const stop = () => {
   runningState.value = false;
