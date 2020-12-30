@@ -184,13 +184,16 @@ const tickUntilStopped = async () => {
 };
 
 const onRemoveColor = (colorEntity: IColorEntity) => {
-  console.log(colorEntity);
-
   const newColorSequence = colorSequence.value.filter(
     (color) => color.id !== colorEntity.id
   );
 
   colorSequence.value = newColorSequence;
+  reset();
+};
+
+const reset = () => {
+  actionsPerformedCount.value = 0;
 };
 
 export default function (): ITrafficLightBlackboard {

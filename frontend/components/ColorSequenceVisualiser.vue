@@ -1,14 +1,14 @@
 <template>
   <div class="flex">
     <div
-      v-for="color in colorSequence"
-      :key="color.id"
+      v-for="(color, index) in colorSequence"
+      :key="index"
       @click="$emit('remove-color', color)"
     >
       <div class="h-16 w-32">
         <div
           :class="`w-full h-full bg-white flex flex-col justify-end items-center
-          ${color.id === activeIndex ? 'border-4 border-yellow-400' : ''}`"
+          ${index === activeIndex ? 'border-4 border-yellow-400' : ''}`"
           :style="{ backgroundColor: color.color }"
         ></div>
       </div>
