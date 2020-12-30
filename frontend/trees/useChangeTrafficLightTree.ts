@@ -199,7 +199,8 @@ const onRemoveColor = (colorEntity: IColorEntity) => {
   );
 
   colorSequence.value = newColorSequence;
-  reset();
+  // reset();
+  actionsPerformedCount.value -= 1;
 };
 
 const reset = () => {
