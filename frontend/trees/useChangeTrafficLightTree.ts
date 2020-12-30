@@ -46,21 +46,22 @@ interface ITrafficLightBlackboard {
   colorSequence: Ref<IColorEntity[]>;
   activeIndex: Ref<number>;
   onRemoveColor: Function;
+  reset: Function;
 }
 // Behaviour Tree
 // ##############
 // Actions
 const setTrafficLightGreenAction = new ActionNode<ITrafficLightBlackboard>(
   ({ trafficLightState }) => {
-    console.log('Green');
+    console.log('Set Green');
     incrementActionsPerformed();
     trafficLightState.value = ColorsEnum.Green;
     return NodeState.Success;
   }
 );
-const setTrafficLightYellowAction = new ActionNode<ITrafficLightBlackboard>(
+const setTrafficAmberYellowAction = new ActionNode<ITrafficLightBlackboard>(
   ({ trafficLightState }) => {
-    console.log('Amber');
+    console.log('Set Amber');
     incrementActionsPerformed();
     trafficLightState.value = ColorsEnum.Amber;
     return NodeState.Success;
@@ -68,7 +69,7 @@ const setTrafficLightYellowAction = new ActionNode<ITrafficLightBlackboard>(
 );
 const setTrafficLightRedAction = new ActionNode<ITrafficLightBlackboard>(
   ({ trafficLightState }) => {
-    console.log('Red');
+    console.log('Set Red');
     incrementActionsPerformed();
     trafficLightState.value = ColorsEnum.Red;
     return NodeState.Success;
@@ -77,40 +78,48 @@ const setTrafficLightRedAction = new ActionNode<ITrafficLightBlackboard>(
 // Conditions
 const greenShouldShow = new ConditionNode<ITrafficLightBlackboard>(
   ({ colorSequence }) => {
-    const colorSequenceIndex = getColorSequenceIndex();
-    return colorSequence.value[colorSequenceIndex].color === ColorsEnum.Green;
+    const colorSequenceIndex = getNextColorSequenceIndex();
+    const result =
+      colorSequence.value[colorSequenceIndex].color === ColorsEnum.Green;
+    // console.log('Green Should Show: ', result);
+
+    return result;
   }
 );
 
 const amberShouldShow = new ConditionNode<ITrafficLightBlackboard>(
   ({ colorSequence }) => {
-    const colorSequenceIndex = getColorSequenceIndex();
-    return colorSequence.value[colorSequenceIndex].color === ColorsEnum.Amber;
+    const colorSequenceIndex = getNextColorSequenceIndex();
+    const result =
+      colorSequence.value[colorSequenceIndex].color === ColorsEnum.Amber;
+    // console.log('Amber Should Show: ', result);
+    return result;
   }
 );
 
 const redShouldShow = new ConditionNode<ITrafficLightBlackboard>(
   ({ colorSequence }) => {
-    const colorSequenceIndex = getColorSequenceIndex();
-    return colorSequence.value[colorSequenceIndex].color === ColorsEnum.Red;
+    const colorSequenceIndex = getNextColorSequenceIndex();
+    const result =
+      colorSequence.value[colorSequenceIndex].color === ColorsEnum.Red;
+    // console.log('Red Should Show: ', result);
+
+    return result;
   }
 );
 
-const getColorSequenceIndex = () =>
+const getNextColorSequenceIndex = () =>
   actionsPerformedCount.value % colorSequence.value.length;
 
-// Timer before action
-const setGreen = new TimerNode(1000, setTrafficLightGreenAction);
-const setYellow = new TimerNode(1000, setTrafficLightYellowAction);
-const setRed = new TimerNode(1000, setTrafficLightRedAction);
-
 // Sequences
-const green = new SequenceNode([greenShouldShow, setGreen]);
-const yellow = new SequenceNode([amberShouldShow, setYellow]);
-const red = new SequenceNode([redShouldShow, setRed]);
+const green = new SequenceNode([greenShouldShow, setTrafficLightGreenAction]);
+const yellow = new SequenceNode([amberShouldShow, setTrafficAmberYellowAction]);
+const red = new SequenceNode([redShouldShow, setTrafficLightRedAction]);
 
 // Selector
-const selector = new SelectorNode([green, yellow, red]);
+const createNewSelector = () =>
+  new TimerNode(1000, new SelectorNode([green, yellow, red]));
+let selector = createNewSelector();
 
 // Repeater
 const repeatUntilFailureNode = new RepeatUntilFailureNode(selector);
@@ -126,6 +135,7 @@ const useTreeContext = (): ITrafficLightBlackboard => {
     colorSequence,
     activeIndex,
     onRemoveColor,
+    reset,
   };
 };
 
@@ -148,7 +158,7 @@ const start = () => {
 const stop = () => {
   runningState.value = false;
 };
-const shouldStop = () => nodeState.value !== NodeState.Failure;
+const shouldContinue = () => nodeState.value !== NodeState.Failure;
 
 const tick = () => {
   console.info('Tick');
@@ -173,7 +183,7 @@ const tickUntilStopped = async () => {
   if (runningState.value) {
     nodeState.value = tick();
 
-    if (shouldStop()) {
+    if (shouldContinue()) {
       // await waitForDelay(changeColorDelay.value);
       await waitForDelay(100);
       tickUntilStopped();
@@ -194,6 +204,10 @@ const onRemoveColor = (colorEntity: IColorEntity) => {
 
 const reset = () => {
   actionsPerformedCount.value = 0;
+  // runningState.value = false;
+  trafficLightState.value = ColorsEnum.White;
+  nodeState.value = undefined;
+  selector = createNewSelector();
 };
 
 export default function (): ITrafficLightBlackboard {

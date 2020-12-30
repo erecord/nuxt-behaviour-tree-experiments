@@ -9,7 +9,9 @@
       <button class="" @click="start">Start</button>
       <button class="" @click="stop">Stop</button>
       <button class="" @click="tick">Tick</button>
-      <Slider :default="babylonCanvasHeight" @input="handleSliderInputEvent" />
+      <button class="" @click="reset">Reset</button>
+
+      <!-- <Slider :default="babylonCanvasHeight" @input="handleSliderInputEvent" /> -->
       <TreeState :current-node-state="nodeState" />
       <ColorSequenceVisualiser
         :color-sequence="colorSequence"
@@ -37,6 +39,7 @@ export default defineComponent({
       activeIndex,
       tick,
       onRemoveColor,
+      reset,
     } = useChangeTrafficLightTree();
 
     const babylonCanvasHeight = ref<number>(55);
@@ -58,6 +61,7 @@ export default defineComponent({
       colorSequence,
       activeIndex,
       onRemoveColor,
+      reset,
     };
   },
 });
