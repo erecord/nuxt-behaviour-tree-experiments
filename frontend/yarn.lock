@@ -10972,6 +10972,11 @@ vm-browserify@^1.0.1:
   resolved "https://registry.yarnpkg.com/vm-browserify/-/vm-browserify-1.1.2.tgz#78641c488b8e6ca91a75f511e7a3b32a86e5dda0"
   integrity sha512-2ham8XPWTONajOR0ohOKOHXkm3+gaBmGut3SRuu75xLd/RRaY6vqgh8NBYYk7+RW3u5AtzPQZG8F10LHkl0lAQ==
 
+vue-accessible-color-picker@^1.1.2:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/vue-accessible-color-picker/-/vue-accessible-color-picker-1.1.2.tgz#6f60ccc7265c471ca0e7773d8a6462185226e311"
+  integrity sha512-mVQmi+kei4w/9nIZbeOCLivSVUOaIlJ6odLiqbUEftCEN1jPtp5pCSParWw7sIO+CyoNzUz31oK46gwbApLiKQ==
+
 vue-client-only@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/vue-client-only/-/vue-client-only-2.0.0.tgz#ddad8d675ee02c761a14229f0e440e219de1da1c"
