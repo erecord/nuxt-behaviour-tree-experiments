@@ -18,6 +18,7 @@
         :active-index="activeIndex"
         @remove-color="onRemoveColor"
       />
+      <!-- <ColorPicker @color-change="onColorChanged" /> -->
     </div>
   </div>
 </template>
@@ -25,7 +26,9 @@
 <script lang="ts">
 import { defineComponent, ref } from '@nuxtjs/composition-api';
 import scene from '../scenes/CubeColorChangerScene';
-import useChangeTrafficLightTree from '~/trees/useChangeTrafficLightTree';
+import useChangeTrafficLightTree, {
+  IColorEntity,
+} from '~/trees/useChangeTrafficLightTree';
 
 export default defineComponent({
   setup() {
@@ -50,6 +53,18 @@ export default defineComponent({
       babylonCanvasHeight.value = sliderValue;
     };
 
+    interface ColorChangedEvent {
+      colors: { hex: String };
+    }
+    const onColorChanged = (event: ColorChangedEvent) => {
+      const hexColor = event.colors.hex;
+      const colorSequenceLength = colorSequence.value.length;
+      colorSequence.value.push({
+        id: colorSequenceLength + 1,
+        color: hexColor,
+      } as IColorEntity);
+    };
+
     return {
       canvasRef,
       start,
@@ -62,6 +77,7 @@ export default defineComponent({
       activeIndex,
       onRemoveColor,
       reset,
+      onColorChanged,
     };
   },
 });
